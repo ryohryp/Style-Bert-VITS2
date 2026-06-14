@@ -1,7 +1,7 @@
 accelerate
 cmudict
 cn2an
-faster-whisper==0.10.1
+faster-whisper>=1.0.3
 g2p_en
 GPUtil
 gradio>=4.32
@@ -25,9 +25,10 @@ pyloudnorm
 pyopenjtalk-dict
 pypinyin
 pyworld-prebuilt
+soxr
 stable_ts
 tensorboard
 torch<2.4
 torchaudio<2.4
-transformers
+transformers>=4.34.0,<4.49.0
 umap-learn
