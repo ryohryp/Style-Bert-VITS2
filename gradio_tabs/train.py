@@ -172,6 +172,11 @@ def preprocess_text(
 ):
     logger.info("Step 3: start preprocessing text...")
     paths = get_path(model_name)
+    import os
+    try:
+        os.listdir(str(paths.dataset_path))
+    except:
+        pass
     if not paths.esd_path.exists():
         logger.error(f"Step 3: {paths.esd_path} not found.")
         return (
