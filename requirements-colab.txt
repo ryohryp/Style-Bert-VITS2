@@ -20,7 +20,7 @@ pyopenjtalk-dict
 pypinyin
 pyworld-prebuilt
 torch
-torchaudio
+torchaudio<2.9
 torchvision
 transformers
 umap-learn
