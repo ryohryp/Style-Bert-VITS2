@@ -125,8 +125,11 @@ if __name__ == "__main__":
     normalize: bool = args.normalize
     trim: bool = args.trim
 
-    # 後でlibrosaに読ませて有効な音声ファイルかチェックするので、全てのファイルを取得
-    original_files = [f for f in input_dir.rglob("*") if f.is_file()]
+    import os
+    original_files = []
+    for root, dirs, files in os.walk(str(input_dir)):
+        for file in files:
+            original_files.append(Path(root) / file)
 
     if len(original_files) == 0:
         logger.error(f"No files found in {input_dir}")

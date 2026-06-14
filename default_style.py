@@ -16,10 +16,13 @@ def save_neutral_vector(
 ):
     wav_dir = Path(wav_dir)
     output_dir = Path(output_dir)
-    embs = []
-    for file in wav_dir.rglob("*.npy"):
-        xvec = np.load(file)
-        embs.append(np.expand_dims(xvec, axis=0))
+    import os
+    for root, dirs, files in os.walk(str(wav_dir)):
+        for file in files:
+            if file.endswith(".npy"):
+                npy_file = Path(root) / file
+                xvec = np.load(npy_file)
+                embs.append(np.expand_dims(xvec, axis=0))
 
     x = np.concatenate(embs, axis=0)  # (N, 256)
     mean = np.mean(x, axis=0)  # (256,)
@@ -60,16 +63,24 @@ def save_styles_by_dirs(
 
     # First get mean of all for Neutral
     embs = []
-    for file in wav_dir.rglob("*.npy"):
-        xvec = np.load(file)
-        embs.append(np.expand_dims(xvec, axis=0))
+    import os
+    for root, dirs, files in os.walk(str(wav_dir)):
+        for file in files:
+            if file.endswith(".npy"):
+                npy_file = Path(root) / file
+                xvec = np.load(npy_file)
+                embs.append(np.expand_dims(xvec, axis=0))
     x = np.concatenate(embs, axis=0)  # (N, 256)
     mean = np.mean(x, axis=0)  # (256,)
     style_vectors = [mean]
 
     names = [DEFAULT_STYLE]
     for style_dir in subdirs:
-        npy_files = list(style_dir.rglob("*.npy"))
+        npy_files = []
+        for root, dirs, files in os.walk(str(style_dir)):
+            for file in files:
+                if file.endswith(".npy"):
+                    npy_files.append(Path(root) / file)
         if not npy_files:
             continue
         embs = []
