@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from typing import Union
 
@@ -6,6 +7,17 @@ import numpy as np
 
 from style_bert_vits2.constants import DEFAULT_STYLE
 from style_bert_vits2.logging import logger
+
+
+def listdir_recursive(dir_path):
+    files_list = []
+    for entry in os.listdir(str(dir_path)):
+        full_path = os.path.join(str(dir_path), entry)
+        if os.path.isdir(full_path):
+            files_list.extend(listdir_recursive(full_path))
+        else:
+            files_list.append(Path(full_path))
+    return files_list
 
 
 def save_neutral_vector(
@@ -16,13 +28,11 @@ def save_neutral_vector(
 ):
     wav_dir = Path(wav_dir)
     output_dir = Path(output_dir)
-    import os
-    for root, dirs, files in os.walk(str(wav_dir)):
-        for file in files:
-            if file.endswith(".npy"):
-                npy_file = Path(root) / file
-                xvec = np.load(npy_file)
-                embs.append(np.expand_dims(xvec, axis=0))
+    embs = []
+    for file in listdir_recursive(wav_dir):
+        if file.name.endswith(".npy"):
+            xvec = np.load(file)
+            embs.append(np.expand_dims(xvec, axis=0))
 
     x = np.concatenate(embs, axis=0)  # (N, 256)
     mean = np.mean(x, axis=0)  # (256,)
@@ -63,13 +73,10 @@ def save_styles_by_dirs(
 
     # First get mean of all for Neutral
     embs = []
-    import os
-    for root, dirs, files in os.walk(str(wav_dir)):
-        for file in files:
-            if file.endswith(".npy"):
-                npy_file = Path(root) / file
-                xvec = np.load(npy_file)
-                embs.append(np.expand_dims(xvec, axis=0))
+    for file in listdir_recursive(wav_dir):
+        if file.name.endswith(".npy"):
+            xvec = np.load(file)
+            embs.append(np.expand_dims(xvec, axis=0))
     x = np.concatenate(embs, axis=0)  # (N, 256)
     mean = np.mean(x, axis=0)  # (256,)
     style_vectors = [mean]
@@ -77,10 +84,9 @@ def save_styles_by_dirs(
     names = [DEFAULT_STYLE]
     for style_dir in subdirs:
         npy_files = []
-        for root, dirs, files in os.walk(str(style_dir)):
-            for file in files:
-                if file.endswith(".npy"):
-                    npy_files.append(Path(root) / file)
+        for file in listdir_recursive(style_dir):
+            if file.name.endswith(".npy"):
+                npy_files.append(file)
         if not npy_files:
             continue
         embs = []

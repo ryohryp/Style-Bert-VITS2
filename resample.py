@@ -126,10 +126,17 @@ if __name__ == "__main__":
     trim: bool = args.trim
 
     import os
-    original_files = []
-    for root, dirs, files in os.walk(str(input_dir)):
-        for file in files:
-            original_files.append(Path(root) / file)
+    def listdir_recursive(dir_path):
+        files_list = []
+        for entry in os.listdir(str(dir_path)):
+            full_path = os.path.join(str(dir_path), entry)
+            if os.path.isdir(full_path):
+                files_list.extend(listdir_recursive(full_path))
+            else:
+                files_list.append(Path(full_path))
+        return files_list
+
+    original_files = listdir_recursive(input_dir)
 
     if len(original_files) == 0:
         logger.error(f"No files found in {input_dir}")
