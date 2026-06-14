@@ -93,9 +93,10 @@ def initialize_worker(port: int = WORKER_PORT) -> None:
         import os
         import subprocess
 
-        worker_pkg_path = os.path.relpath(
-            os.path.dirname(__file__), os.getcwd()
-        ).replace(os.sep, ".")
+        repo_root = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")
+        )
+        worker_pkg_path = "style_bert_vits2.nlp.japanese.pyopenjtalk_worker"
         args = [sys.executable, "-m", worker_pkg_path, "--port", str(port)]
         # new session, new process group
         if sys.platform.startswith("win"):
@@ -103,7 +104,7 @@ def initialize_worker(port: int = WORKER_PORT) -> None:
             si = subprocess.STARTUPINFO()  # type: ignore
             si.dwFlags |= subprocess.STARTF_USESHOWWINDOW  # type: ignore
             si.wShowWindow = subprocess.SW_HIDE  # type: ignore
-            subprocess.Popen(args, creationflags=cf, startupinfo=si)
+            subprocess.Popen(args, creationflags=cf, startupinfo=si, cwd=repo_root)
         else:
             # align with Windows behavior
             # start_new_session is same as specifying setsid in preexec_fn
@@ -112,6 +113,7 @@ def initialize_worker(port: int = WORKER_PORT) -> None:
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 start_new_session=True,
+                cwd=repo_root,
             )
 
         # wait until server listening
