@@ -66,7 +66,10 @@ def initialize(
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_name = f"preprocess_{timestamp}.log"
     if logger_handler is not None:
-        logger.remove(logger_handler)
+        try:
+            logger.remove(logger_handler)
+        except ValueError:
+            pass
     logger_handler = logger.add(paths.dataset_path / file_name)
 
     logger.info(
